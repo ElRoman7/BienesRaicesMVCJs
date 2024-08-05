@@ -1,9 +1,11 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
+import propiedadesRoutes from './routes/propiedadesRoutes.js';
 import db from './config/db.js';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+
 
 
 // Crear App
@@ -28,7 +30,7 @@ try {
 } catch (error) {
     console.log(error);
 
-}
+} 
 
 // Habilitar Pug
 app.set('view engine', 'pug');
@@ -39,6 +41,7 @@ app.use(express.static('public'));
 
 // Routing
 app.use('/auth', userRoutes);
+app.use('/', propiedadesRoutes);
 
 
 

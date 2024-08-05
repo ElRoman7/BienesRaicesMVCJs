@@ -32,4 +32,9 @@ const Usuario = db.define('usuarios',{
     }
 });
 
+// Métodos Personalizados
+Usuario.prototype.verificarPassword = function(password){ //con arrow functions no podemos usar el this
+    return bcrypt.compareSync(password, this.password );
+}
+
 export default Usuario

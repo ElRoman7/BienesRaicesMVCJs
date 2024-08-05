@@ -1,19 +1,79 @@
 import { check, validationResult, body } from 'express-validator';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 import Usuario from '../models/Usuario.js'
-import { generarId } from '../helpers/tokens.js';
+import { generarId, generarJWT } from '../helpers/tokens.js';
 import { emailOlvidePassword, emailRegistro } from '../helpers/emails.js'
-import { where } from 'sequelize';
 
 const formularioLogin =  (req, res) => {
     res.render('auth/login',{
-        pagina: 'Iniciar Sesión'
+        pagina: 'Iniciar Sesión',
+        csrfToken: req.csrfToken(), 
         
     });
     
 }
 
-const formularioRegistro =  (req, res) => {
+const autenticar = async (req, res) => {
+    await check('email').isEmail().withMessage('El email es Incorrecto').run(req);
+    await check('password').notEmpty().withMessage('La contraseña es Obligatoria').run(req);
 
+    let resultado = validationResult(req);
+
+    // Validar formulario
+
+    if(!resultado.isEmpty()){
+        return res.render('auth/login',{
+            pagina : 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: resultado.array(),
+        });
+    }
+
+    // Comprobar si el usuario existe
+
+    const { email, password } = req.body;
+
+    const usuario = await Usuario.findOne({where: {email}})
+    if(!usuario){
+        return res.render('auth/login',{
+            pagina : 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'El usuario no existe'}]
+        });
+    }
+
+    // Comprobar si el usuario si está confirmado
+    if(!usuario.confirmado){
+        return res.render('auth/login',{
+            pagina : 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'Tu cuenta no ha sido confirmada'}]
+        });
+    }
+
+    // Revisar el Password
+    if(!usuario.verificarPassword(password)){
+        return res.render('auth/login',{
+            pagina : 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'El password es Incorrecto'}]
+        });
+    }
+
+    // Autenticar el usuario
+    const token = generarJWT({id:usuario.id, nombre:usuario.nombre});
+
+    console.log(token);
+
+    // Almacenar en un cookie
+    return res.cookie('_token', token, {
+        httpOnly: true,
+        // secure: true, //Para certificado SSL
+    }).redirect('/mis-propiedades');
+}
+
+const formularioRegistro =  (req, res) => {
     res.render('auth/registro',{
         pagina : 'Crear Cuenta',
         csrfToken : req.csrfToken()
@@ -178,16 +238,63 @@ const resetPassword = async (req, res) => {
 }
 
 
-const comprobarToken = (req, res) => {
+const comprobarToken = async (req, res) => {
+    
+    const {token} = req.params;
+    const usuario = await Usuario.findOne({where: {token}});
+    console.log(usuario);
+
+    if(!usuario){
+        return res.render('auth/confirmar-cuenta',{
+            pagina: 'Restablece tu Contraseña',
+            mensaje: 'Hubo un error al validar tu información, intenta de nuevo',
+            error: true
+        });
+    }
+
+    // Mostrar formulario para modificar password
+    res.render('auth/reset-password', {
+        pagina: 'Reestablece Tu Password',
+        csrfToken: req.csrfToken()
+    })
 
 }
 
-const nuevoPassword = (req, res) => {
-    
+const nuevoPassword = async (req, res) => {
+    await check('password').isLength({min:6}).withMessage('El password debe ser de al menos 6 caracteres').run(req);
+    let resultado = validationResult(req);
+
+    if(!resultado.isEmpty()){
+        return res.render('auth/reset-password',{
+            pagina : 'Reestablece tu Password',
+            csrfToken: req.csrfToken(),
+            errores: resultado.array(),
+        });
+    }
+
+    const { token } = req.params
+    const { password } = req.body
+    const usuario = await Usuario.findOne({where: {token}})
+    console.log(usuario);
+
+    // Hashear el nuevo Password (Se hashea aqui y no desde el modelo porque si se actualiza cualquier otra cosa se actualiza tambien el password hasheado y se vuelve a hashear)
+    const salt = await bcrypt.genSalt(10)
+    usuario.password = await bcrypt.hash(password, salt);
+    usuario.token = null;
+
+    await usuario.save();
+
+    res.render('auth/confirmar-cuenta',{
+        pagina: 'Password Reestablecido',
+        mensaje: 'El Password se guardó correctamente'
+    })
+
+    console.log('Guardando el Password');
 }
 
 export {
     formularioLogin,
+    autenticar,
     formularioRegistro,
     formularioOlvidePassword,
     registrar,
