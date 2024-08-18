@@ -13,11 +13,11 @@ block contenido
 
         div(class="bg-white shadow py-8 px-4 rounded mx-auto max-w-4xl mt-5 md:px-10")
 
-            form(id="imagen" class="space-y-8 dropzone border-dashed border-2 w-full min-h-44 h-auto rounded flex-col justify-center items-center" method="POST" action=`propiedades/agregar-imagen/${propiedad.id}`) 
+            form(id="imagen" class="space-y-8 dropzone border-dashed border-2 w-full min-h-44 h-auto rounded flex-col justify-center items-center" method="POST" action=`/propiedades/agregar-imagen/${propiedad.id}`) 
                 input(type="hidden" name="_csrf" value=csrfToken)
 
 
-            input(class="w-full mt-5 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white font-bold uppercase cursor-pointer" type="submit" value="Publicar Propiedad")
+            button(class="w-full mt-5 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white font-bold uppercase cursor-pointer" type="button" id="publicar") Publicar Propiedad
 
 block scripts 
     script(src='/js/agregarImagen.js')
