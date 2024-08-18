@@ -24,7 +24,10 @@ router.post('/propiedades/crear',
     guardar //Funcion de guardar en el controlador de propiedadController
 );
 
-router.get('/propiedades/agregar-imagen/:id', protegerRuta, agregarImagen)
+router.get('/propiedades/agregar-imagen/:id', protegerRuta, agregarImagen);
+router.post('/propiedades/agregar-imagen/:id', (req,res) => {
+    
+})
 
 
 export default router

@@ -26,7 +26,7 @@ eval("(function webpackUniversalModuleDefinition(root, factory) {\n\tif(true)\n\
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var dropzone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! dropzone */ \"./node_modules/dropzone/dist/dropzone.js\");\n\r\n\r\n// alert('Funciona')\n\n//# sourceURL=webpack://bienesraicesjs.mvc/./src/js/agregarImagen.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var dropzone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! dropzone */ \"./node_modules/dropzone/dist/dropzone.js\");\n\r\n// imagen es el id del formulario\r\nconst token = document.querySelector('meta[name=\"csrf-token\"]').content\r\n\r\nconsole.log(token);\r\n\r\n\r\ndropzone__WEBPACK_IMPORTED_MODULE_0__.Dropzone.options.imagen = {\r\n    dictDefaultMessage: 'Arrastra aquí tus imágenes',\r\n    acceptedFiles: '.png,.jpg,.jpeg',\r\n    maxFilesize: 5,\r\n    maxFiles: 1,\r\n    parallelUploads:1,\r\n    autoProcessQueue: true,\r\n    addRemoveLinks: true,\r\n    dictRemoveFile: 'Borrar Archivo',\r\n    dictMaxFilesExceeded: 'Solo puedes subir 1 archivo',\r\n    headers: {\r\n        'CSRF-Token': token\r\n    }\r\n\r\n\r\n}\n\n//# sourceURL=webpack://bienesraicesjs.mvc/./src/js/agregarImagen.js?");
 
 /***/ })
 

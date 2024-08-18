@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use(csrf({cookie: true}));
 
-// Habilitar lectura de datos de formularios
+// Habilitar lectura de datos de formularios de tipo texto, no archivos
 app.use(express.urlencoded({extended: true}))
 
 // Conexion a la base de datos
