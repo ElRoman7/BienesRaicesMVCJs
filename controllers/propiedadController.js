@@ -1,9 +1,17 @@
 import { validationResult } from 'express-validator'
 import { Precio, Categoria, Propiedad } from '../models/index.js'
 
-const admin = (req, res) =>{
+const admin = async (req, res) =>{
+    const { id } = req.usuario;
+    const propiedades = await Propiedad.findAll({
+        where: {
+            usuarioId : id
+        }
+    })
+
     res.render('propiedades/admin', {
         pagina: 'Mis Propiedades',
+        propiedades
     })
 }
 
@@ -83,13 +91,14 @@ const guardar = async (req, res) =>{
             lng,
             precioId,
             usuarioId,
+            categoriaId,
             imagen: ''
 
 
         });
         
         const {id} = propiedadGuardada;
-        res.redirect(`propiedades/agregar-imagen/${id}`)
+        res.redirect(`/propiedades/agregar-imagen/${id}`)
 
 
     } catch (error) {
