@@ -8,7 +8,7 @@ const admin = async (req, res) =>{
     // Leer Query String
     const {pagina : paginaActual} = req.query //Renombrar variable
     // Expresion Regular, solo se admiten de 0 a 9
-    const expresion = /^[1-9]$/;
+    const expresion = /^[0-9]$/;
     // Validar Query String
     if(!expresion.test(paginaActual)){
         return res.redirect('/mis-propiedades?pagina=1')
@@ -42,13 +42,21 @@ const admin = async (req, res) =>{
             })
         ])
 
-        console.log(total);
-        
-    
+        const paginas = Math.ceil(total/limit);
+
+        if(paginaActual > paginas) {
+            res.redirect('/mis-propiedades?pagina=1')
+        }
+
         res.render('propiedades/admin', {
             pagina: 'Mis Propiedades',
             propiedades,
             csrfToken: req.csrfToken(),
+            paginas,
+            paginaActual: Number(paginaActual),
+            total,
+            offset,
+            limit
         })
     } catch (error) {
         console.log(error);
