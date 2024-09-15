@@ -7,9 +7,9 @@ import upload from '../middleware/subirImagen.js'
 
 const router = express.Router()
 
-router.get('/', (req, res) => {
-    res.redirect('/mis-propiedades');
-});
+// router.get('/', (req, res) => {
+//     res.redirect('/mis-propiedades');
+// });
 
 router.get('/mis-propiedades', protegerRuta, admin)
 
