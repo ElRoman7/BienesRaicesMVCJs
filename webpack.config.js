@@ -7,6 +7,7 @@ export default {
         agregarImagen: './src/js/agregarImagen.js',
         alertaEliminarPropiedad: './src/js/alertaEliminarPropiedad.js',
         mostrarMapa: './src/js/mostrarMapa.js',
+        mapaInicio: './src/js/mapaInicio.js',
     },
     output: {
         filename: '[name].js',
