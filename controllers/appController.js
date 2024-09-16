@@ -69,32 +69,65 @@ const inicio = async (req, res) => {
 }
 
 
-const categoria = async(req, res) => {
-    
-    const { id } = req.params
+const categoria = async (req, res) => {
+    const { id } = req.params;
+    let { pagina: paginaActual = 1 } = req.query; // Valor por defecto a 1
 
-    // Comprobar que la categoría exista
-    const categoria = await Categoria.findByPk(id)
-    if(!categoria){
+    // Validar que paginaActual sea un número entero
+    paginaActual = Number(paginaActual);
+    if (isNaN(paginaActual) || paginaActual < 1) {
+        return res.redirect(`/categorias/${id}?pagina=1`);
+    }
+
+    // Comprobar que la categoría exista antes de continuar
+    const categoria = await Categoria.findByPk(id);
+    if (!categoria) {
         return res.redirect('/404');
     }
-    // Obtener las propiedades de la categoría    
-    const propiedades = await Propiedad.findAll({
-        where:{
-            categoriaId: id
-        },
-        include:[
-            {
-                model: Precio, as: 'precio'
-            }
-        ]
-    });
 
-    res.render('categoria', {
-        pagina: `${categoria.nombre}s en Venta `,
-        propiedades,
-    })
-}
+    try {
+        // Parámetros para la paginación
+        const limit = 6;
+        const offset = (paginaActual - 1) * limit;
+
+        // Obtener propiedades y total de la categoría en paralelo
+        const [propiedades, total] = await Promise.all([
+            Propiedad.findAll({
+                limit,
+                offset,
+                where: { categoriaId: id },
+                include: [{ model: Precio, as: 'precio' }]
+            }),
+            Propiedad.count({ where: { categoriaId: id } })
+        ]);
+
+        const paginas = Math.ceil(total / limit);
+
+        // Redirigir si la página solicitada excede el número de páginas disponibles
+        if(total != 0){
+            if (paginaActual > paginas) {
+                return res.redirect(`/categorias/${id}?pagina=1`);
+            }
+        }
+
+        // Renderizar la vista con los datos obtenidos
+        res.render('categoria', {
+            pagina: `${categoria.nombre}s en Venta`,
+            propiedades,
+            total,
+            offset,
+            limit,
+            paginaActual,
+            paginas,
+            baseUrl: `/categorias/${id}`
+        });
+        
+    } catch (error) {
+        console.error('Error al cargar la categoría:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+};
+
 
 const noEncontrado = (req, res) => {
     

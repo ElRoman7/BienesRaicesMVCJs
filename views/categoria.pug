@@ -1,4 +1,5 @@
 extends ./layout/app
+include mixins/pagination
 
 block contenido 
     section(class="py-5")
@@ -7,8 +8,12 @@ block contenido
         if propiedades.length
             div(class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-14")
                 each propiedad in propiedades 
-                    include ./templates/card                                        
+                    include ./templates/card
+     
+            +pagination(baseUrl, paginaActual, paginas, offset, limit, total, false)                                   
         else 
             p(class="text-center text-gray-800 text-sm py-10") No Hay Resultados
+
+        
     //- pre= JSON.stringify(departamentos, undefined, 2)
 

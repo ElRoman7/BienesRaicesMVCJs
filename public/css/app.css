@@ -703,6 +703,9 @@ video {
 .rounded-sm {
   border-radius: 0.125rem;
 }
+.rounded-none {
+  border-radius: 0px;
+}
 .border {
   border-width: 1px;
 }
@@ -726,6 +729,14 @@ video {
 .border-indigo-500 {
   --tw-border-opacity: 1;
   border-color: rgb(99 102 241 / var(--tw-border-opacity));
+}
+.border-gray-600 {
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity));
+}
+.border-gray-400 {
+  --tw-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity));
 }
 .bg-gray-50 {
   --tw-bg-opacity: 1;

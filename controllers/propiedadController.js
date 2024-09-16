@@ -56,7 +56,8 @@ const admin = async (req, res) =>{
             paginaActual: Number(paginaActual),
             total,
             offset,
-            limit
+            limit,
+            baseUrl: '/mis-propiedades'
         })
     } catch (error) {
         console.log(error);
