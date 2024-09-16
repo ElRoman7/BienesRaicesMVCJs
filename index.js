@@ -1,6 +1,8 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
 import propiedadesRoutes from './routes/propiedadesRoutes.js';
+import appRoutes from './routes/appRoutes.js';
+import apiRoutes from './routes/apiRoutes.js';
 import db from './config/db.js';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
@@ -40,8 +42,10 @@ app.set('views', './views');
 app.use(express.static('public'));
 
 // Routing
+app.use('/', appRoutes)
 app.use('/auth', userRoutes);
 app.use('/', propiedadesRoutes);
+app.use('/api', apiRoutes)
 
 
 
