@@ -10,10 +10,11 @@ router.get('/', inicio)
 router.get('/categorias/:id', categoria)
 
 // Buscador
+router.post('/buscador', buscador)
 router.get('/buscador', buscador)
 
 // 404
-router.get('404', noEncontrado)
+router.get('/404', noEncontrado)
 
 
 

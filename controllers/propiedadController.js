@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator'
-import { Precio, Categoria, Propiedad } from '../models/index.js'
+import { Precio, Categoria, Propiedad, Mensaje, Usuario } from '../models/index.js'
 import {unlink} from 'node:fs/promises'
+import { esVendedor, formatearFecha } from '../helpers/index.js'
 
 const admin = async (req, res) =>{
 
@@ -34,6 +35,9 @@ const admin = async (req, res) =>{
                     },
                     {
                         model: Precio, as: 'precio'
+                    },
+                    {
+                        model: Mensaje, as: 'mensajes'
                     }
                 ]
             }),
@@ -44,8 +48,10 @@ const admin = async (req, res) =>{
 
         const paginas = Math.ceil(total/limit);
 
-        if(paginaActual > paginas) {
-            res.redirect('/mis-propiedades?pagina=1')
+        if(total > 0){
+            if(paginaActual > paginas) {
+                res.redirect('/mis-propiedades?pagina=1')
+            }
         }
 
         res.render('propiedades/admin', {
@@ -56,7 +62,8 @@ const admin = async (req, res) =>{
             paginaActual: Number(paginaActual),
             total,
             offset,
-            limit
+            limit,
+            baseUrl: '/mis-propiedades'
         })
     } catch (error) {
         console.log(error);
@@ -121,7 +128,7 @@ const guardar = async (req, res) =>{
 
             } = req.body
 
-        console.log(req.usuario);
+        // console.log(req.usuario);
 
         const {id: usuarioId} = req.usuario
         
@@ -344,8 +351,67 @@ const eliminar = async(req,res) => {
 
 }
 
+// Modifica el Estado de la Propiedad
+const cambiarEstado = async(req, res) => {
+    // id que está en la ruta
+    const {id} = req.params
+
+    // Validar que la propiedad exista
+    const propiedad = await Propiedad.findByPk(id)
+
+    // Revisar que exista la propiedad
+    if(!propiedad){
+        return res.redirect('/mis-propiedades');
+    }
+    // Revisar que quien visita la url es quien creo la propiedad
+    if(propiedad.usuarioId.toString() !== req.usuario.id.toString()){
+        return res.redirect('/mis-propiedades');
+    }
+
+    // Actualizar Propiedad
+    propiedad.publicado = !propiedad.publicado
+
+    await propiedad.save()
+
+    res.json({
+        resultado: true
+    })
+    
+}
+
 // Muestra una Propiedad
 const mostrarPropiedad = async(req, res) => {
+    //* Validar que la propiedad exista
+    //? id que está en la ruta
+    const {id} = req.params
+    //? Cruzar Información de la categoría y precio en base a sus id
+    const propiedad = await Propiedad.findByPk(id,{
+        include:[
+            {
+                model: Categoria, as: 'categoria'
+            },
+            {
+                model: Precio, as: 'precio'
+            }
+        ]
+    })
+
+    // Revisar que exista la propiedad
+    if(!propiedad || !propiedad.publicado){
+        return res.redirect('/404');
+    }
+    
+    
+    res.render('propiedades/mostrar',{
+        propiedad,
+        pagina: propiedad.titulo,
+        csrfToken: req.csrfToken(),
+        usuario: req.usuario,
+        esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId)
+    })
+}
+
+const enviarMensaje = async (req, res) => {
     //* Validar que la propiedad exista
     //? id que está en la ruta
     const {id} = req.params
@@ -366,11 +432,69 @@ const mostrarPropiedad = async(req, res) => {
         return res.redirect('/404');
     }
 
-    res.render('propiedades/mostrar',{
-        propiedad,
-        pagina: propiedad.titulo
+    let resultado = validationResult(req);
+
+
+    if(!resultado.isEmpty()){
+        return res.render('propiedades/mostrar',{
+            propiedad,
+            pagina: propiedad.titulo,
+            csrfToken: req.csrfToken(),
+            usuario: req.usuario,
+            esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+            errores: resultado.array()
+        })
+    }
+
+    const { mensaje } = req.body
+    const { id : propiedadId  } = req.params
+    const { id : usuarioId } = req.usuario
+
+    await Mensaje.create({
+        mensaje,
+        propiedadId,
+        usuarioId
     })
+
+    res.redirect('/')
 }
+
+// Leer mensajes recibidos
+const verMensajes = async (req,res) => {
+    // id que está en la ruta
+    const {id} = req.params
+
+    // Validar que la propiedad exista
+    const propiedad = await Propiedad.findByPk(id, {
+        include:[
+            {
+                model: Mensaje, as: 'mensajes',
+                include: [
+                    {model: Usuario.scope('eliminarPassword'), as: 'usuario'}
+                ]
+            },
+        ]
+    })
+
+    // Revisar que exista la propiedad
+    if(!propiedad){
+        return res.redirect('/mis-propiedades');
+    }
+    // Revisar que quien visita la url es quien creo la propiedad
+    if(propiedad.usuarioId.toString() !== req.usuario.id.toString()){
+        return res.redirect('/mis-propiedades');
+    }
+
+    res.render('propiedades/mensajes',{
+        pagina:'Mensajes',
+        mensajes: propiedad.mensajes,
+        formatearFecha
+    })
+
+
+
+}
+
 
 export {
     admin,
@@ -381,5 +505,8 @@ export {
     editar,
     guardarCambios,
     eliminar,
-    mostrarPropiedad
+    cambiarEstado,
+    mostrarPropiedad,
+    enviarMensaje,
+    verMensajes
 }

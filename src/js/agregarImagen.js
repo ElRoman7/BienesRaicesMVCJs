@@ -3,7 +3,7 @@ import { param } from 'express-validator';
 // imagen es el id del formulario
 const token = document.querySelector('meta[name="csrf-token"]').content
 
-console.log(token);
+// console.log(token);
 
 
 Dropzone.options.imagen = {

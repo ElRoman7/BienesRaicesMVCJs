@@ -13,7 +13,7 @@ const categorias = [
         nombre: 'Terreno'
     },
     {
-        nombre: 'Cabañas'
+        nombre: 'Cabaña'
     }
 
 ];
