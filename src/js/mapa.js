@@ -29,10 +29,10 @@
 
         //Obtener informacion de las calles al soltar el pin
         geocodeService.reverse().latlng(posicion, 14).run(function(error, resultado){
-            console.log(resultado);
+            // console.log(resultado);
 
             marker.bindPopup(resultado.address.LongLabel)
-            console.log(resultado);
+            // console.log(resultado);
             
 
             // Llenar los campos

@@ -8,6 +8,7 @@ export default {
         alertaEliminarPropiedad: './src/js/alertaEliminarPropiedad.js',
         mostrarMapa: './src/js/mostrarMapa.js',
         mapaInicio: './src/js/mapaInicio.js',
+        cambiarEstado: './src/js/cambiarEstado.js',
     },
     output: {
         filename: '[name].js',

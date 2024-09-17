@@ -10,7 +10,7 @@ const emailRegistro = async (datos) =>{
         }
       });
       
-    console.log(datos);
+    // console.log(datos);
 
     const {email, nombre, token } = datos
 
@@ -43,7 +43,7 @@ const emailOlvidePassword = async (datos) =>{
       }
     });
     
-  console.log(datos);
+  // console.log(datos);
 
   const {email, nombre, token } = datos
 

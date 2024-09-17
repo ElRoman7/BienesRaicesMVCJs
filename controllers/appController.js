@@ -1,4 +1,6 @@
+import { Sequelize } from 'sequelize'
 import { Precio, Categoria, Propiedad } from '../models/index.js'
+import { isAuthenticated } from '../helpers/index.js';
 
 const inicio = async (req, res) => {
 
@@ -9,7 +11,8 @@ const inicio = async (req, res) => {
             {
                 limit: 3,
                 where:{
-                    categoriaId : 1
+                    categoriaId : 1,
+                    publicado : 1
                 },
                 include :[
                     {
@@ -24,7 +27,8 @@ const inicio = async (req, res) => {
             {
                 limit: 3,
                 where:{
-                    categoriaId : 2
+                    categoriaId : 2,
+                    publicado : 1
                 },
                 include :[
                     {
@@ -41,7 +45,8 @@ const inicio = async (req, res) => {
             {
                 limit: 3,
                 where:{
-                    categoriaId : 3
+                    categoriaId : 3,
+                    publicado : 1
                 },
                 include :[
                     {
@@ -56,7 +61,7 @@ const inicio = async (req, res) => {
         )
     ])
 
-    console.log(categorias);
+    // console.log(categorias);
     
 
     res.render('inicio',{
@@ -64,7 +69,9 @@ const inicio = async (req, res) => {
         categorias,
         precios,
         casas, 
-        departamentos
+        departamentos,
+        csrfToken: req.csrfToken(),
+        isAuthenticated
     })
 }
 
@@ -87,7 +94,7 @@ const categoria = async (req, res) => {
 
     try {
         // Parámetros para la paginación
-        const limit = 6;
+        const limit = 12;
         const offset = (paginaActual - 1) * limit;
 
         // Obtener propiedades y total de la categoría en paralelo
@@ -95,10 +102,10 @@ const categoria = async (req, res) => {
             Propiedad.findAll({
                 limit,
                 offset,
-                where: { categoriaId: id },
+                where: { categoriaId: id, publicado : 1 },
                 include: [{ model: Precio, as: 'precio' }]
             }),
-            Propiedad.count({ where: { categoriaId: id } })
+            Propiedad.count({ where: { categoriaId: id, publicado : 1 } })
         ]);
 
         const paginas = Math.ceil(total / limit);
@@ -119,9 +126,10 @@ const categoria = async (req, res) => {
             limit,
             paginaActual,
             paginas,
-            baseUrl: `/categorias/${id}`
+            baseUrl: `/categorias/${id}`,
+            csrfToken: req.csrfToken(),
         });
-        
+
     } catch (error) {
         console.error('Error al cargar la categoría:', error);
         res.status(500).send('Error interno del servidor');
@@ -130,11 +138,42 @@ const categoria = async (req, res) => {
 
 
 const noEncontrado = (req, res) => {
-    
-}
+    res.render('404',{
+        pagina: 'No Encontrada',
+        csrfToken: req.csrfToken(),
+    })
+} 
 
-const buscador = (req, res) => {
-    
+const buscador = async (req, res) => {
+    const { termino } = req.body
+
+    // Validar que termino no sea vacío
+    if(!termino.trim()){
+        res.redirect('back');
+    }
+
+    // Consultar Propiedades
+    const propiedades = await Propiedad.findAll({
+        where : {
+            publicado : 1,
+            titulo :{
+                [Sequelize.Op.like] : '%' + termino + '%'
+            }
+        },
+        include: [
+            {model: Precio, as: 'precio'}
+        ]
+    });
+
+    res.render('busqueda', {
+        pagina: 'Resultados de la Búsqueda',
+        propiedades,
+        csrfToken: req.csrfToken(),
+        
+    })
+
+
+
 }
 
 export{

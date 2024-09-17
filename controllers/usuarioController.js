@@ -64,13 +64,17 @@ const autenticar = async (req, res) => {
     // Autenticar el usuario
     const token = generarJWT({id:usuario.id, nombre:usuario.nombre});
 
-    console.log(token);
+    // console.log(token);
 
     // Almacenar en un cookie
     return res.cookie('_token', token, {
         httpOnly: true,
         // secure: true, //Para certificado SSL
     }).redirect('/mis-propiedades');
+}
+
+const cerrarSesion = (req, res) => {
+    return res.clearCookie('_token').status(200).redirect('/auth/login');
 }
 
 const formularioRegistro =  (req, res) => {
@@ -129,7 +133,7 @@ const registrar = async (req,res) => {
         });
     }
 
-    console.log(existeUsuario);
+    // console.log(existeUsuario);
     // Almacenar Usuario
     const usuario = await Usuario.create({
         nombre,
@@ -160,7 +164,7 @@ const confirmar = async (req, res, next) => {
     // Verificar si el token es válido
     
     const usuario = await Usuario.findOne({where: {token}});
-    console.log(usuario);
+    // console.log(usuario);
 
     if(!usuario){
         return res.render('auth/confirmar-cuenta',{
@@ -175,7 +179,7 @@ const confirmar = async (req, res, next) => {
     usuario.token = null;
     usuario.confirmado = true;
     await usuario.save();
-    console.log(usuario);
+    // console.log(usuario);
 
     res.render('auth/confirmar-cuenta',{
         pagina: 'Cuenta Confirmada',
@@ -242,7 +246,7 @@ const comprobarToken = async (req, res) => {
     
     const {token} = req.params;
     const usuario = await Usuario.findOne({where: {token}});
-    console.log(usuario);
+    // console.log(usuario);
 
     if(!usuario){
         return res.render('auth/confirmar-cuenta',{
@@ -275,7 +279,7 @@ const nuevoPassword = async (req, res) => {
     const { token } = req.params
     const { password } = req.body
     const usuario = await Usuario.findOne({where: {token}})
-    console.log(usuario);
+    // console.log(usuario);
 
     // Hashear el nuevo Password (Se hashea aqui y no desde el modelo porque si se actualiza cualquier otra cosa se actualiza tambien el password hasheado y se vuelve a hashear)
     const salt = await bcrypt.genSalt(10)
@@ -289,12 +293,14 @@ const nuevoPassword = async (req, res) => {
         mensaje: 'El Password se guardó correctamente'
     })
 
-    console.log('Guardando el Password');
+    // console.log('Guardando el Password');
 }
+
 
 export {
     formularioLogin,
     autenticar,
+    cerrarSesion,
     formularioRegistro,
     formularioOlvidePassword,
     registrar,

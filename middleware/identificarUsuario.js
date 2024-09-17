@@ -1,42 +1,30 @@
 import jwt from 'jsonwebtoken';
-import { Usuario } from '../models/index.js';
+import { Usuario } from '../models/index.js'
 
-const protegerRuta = async (req, res, next) => {
-    
-    // Verificar si hay un token
+const identificarUsuario = async(req, res, next) => {
+    // Identificar si hay un token en las Cookies
     const {_token} = req.cookies
-    
-
     if(!_token){
-        return res.redirect('/auth/login')
+        req.usuario = null
+        return next();
     }
-    
-    // Comprobar token
+
+    // Comprobar el token
     try {
-        
         const decoded = jwt.verify(_token, process.env.JWT_SECRET);
         const usuario = await Usuario.scope('eliminarPassword').findByPk(decoded.id);
         // console.log(usuario);
 
-        // Almacenar el usuario al Req
         if(usuario){
             req.usuario = usuario
-        }else{
-            return res.redirect('/auth/login')
         }
 
         return next();
-        
 
     } catch (error) {
+        console.log(error);
         return res.clearCookie('_token').redirect('/auth/login')
     }
-    
-
-    // Comprobar el Token
-    // console.log('Desde el Middleware');
-
-    next();
 }
 
-export default protegerRuta
+export default identificarUsuario
