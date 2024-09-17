@@ -396,6 +396,8 @@ const mostrarPropiedad = async(req, res) => {
         ]
     })
 
+    const autenticado = req.usuario == null ? false : true;
+
     // Revisar que exista la propiedad
     if(!propiedad || !propiedad.publicado){
         return res.redirect('/404');
@@ -407,7 +409,8 @@ const mostrarPropiedad = async(req, res) => {
         pagina: propiedad.titulo,
         csrfToken: req.csrfToken(),
         usuario: req.usuario,
-        esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId)
+        esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+        autenticado
     })
 }
 

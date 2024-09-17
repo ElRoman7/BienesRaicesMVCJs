@@ -62,7 +62,7 @@ const inicio = async (req, res) => {
     ])
 
     // console.log(categorias);
-    
+    const autenticado = req.usuario == null ? false : true;
 
     res.render('inicio',{
         pagina: 'Inicio',
@@ -71,7 +71,7 @@ const inicio = async (req, res) => {
         casas, 
         departamentos,
         csrfToken: req.csrfToken(),
-        isAuthenticated
+        autenticado
     })
 }
 
@@ -117,6 +117,8 @@ const categoria = async (req, res) => {
             }
         }
 
+        const autenticado = req.usuario == null ? false : true;
+
         // Renderizar la vista con los datos obtenidos
         res.render('categoria', {
             pagina: `${categoria.nombre}s en Venta`,
@@ -128,6 +130,7 @@ const categoria = async (req, res) => {
             paginas,
             baseUrl: `/categorias/${id}`,
             csrfToken: req.csrfToken(),
+            autenticado
         });
 
     } catch (error) {
@@ -164,15 +167,14 @@ const buscador = async (req, res) => {
             {model: Precio, as: 'precio'}
         ]
     });
+    const autenticado = req.usuario == null ? false : true;
 
     res.render('busqueda', {
         pagina: 'Resultados de la Búsqueda',
         propiedades,
         csrfToken: req.csrfToken(),
-        
+        autenticado
     })
-
-
 
 }
 
