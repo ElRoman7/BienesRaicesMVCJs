@@ -74,6 +74,7 @@ const autenticar = async (req, res) => {
 }
 
 const cerrarSesion = (req, res) => {
+    console.log('CSRF Token:', req.csrfToken());
     return res.clearCookie('_token').status(200).redirect('/auth/login');
 }
 
