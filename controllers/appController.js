@@ -4,9 +4,10 @@ import { isAuthenticated } from '../helpers/index.js';
 
 const inicio = async (req, res) => {
 
-    const [ categorias, precios, casas, departamentos ] = await Promise.all([
-        Categoria.findAll({raw : true}),
-        Precio.findAll({raw : true}),
+    const categorias = Categoria.findAll({raw : true})
+    const precios = Precio.findAll({raw : true});
+
+    const [casas, departamentos ] = await Promise.all([
         Propiedad.findAll(
             {
                 limit: 3,
@@ -41,24 +42,6 @@ const inicio = async (req, res) => {
                 ]
             }
         ),
-        Propiedad.findAll(
-            {
-                limit: 3,
-                where:{
-                    categoriaId : 3,
-                    publicado : 1
-                },
-                include :[
-                    {
-                        model: Precio,
-                        as: 'precio'
-                    }
-                ],
-                order: [
-                    ['createdAt','DESC']
-                ]
-            }
-        )
     ])
 
     // console.log(categorias);
