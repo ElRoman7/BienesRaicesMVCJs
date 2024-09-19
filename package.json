@@ -11,6 +11,7 @@
     "css": "postcss public/css/tailwind.css -o public/css/app.css --watch",
     "js": "webpack --watch",
     "dev": "concurrently \"npm run css\" \"npm run js\" ",
+    "build": "postcss public/css/tailwind.css -o public/css/app.css && webpack",
     "db:importar": "node ./seed/seeder.js -i",
     "db:eliminar": "node ./seed/seeder.js -d"
   },
