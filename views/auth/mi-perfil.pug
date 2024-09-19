@@ -1,0 +1,24 @@
+extends ../layout/admin
+include ../mixins/button
+
+block contenido
+    //- pre= JSON.stringify(usuario, undefined, 2)
+    div(class="py-10")
+        h2(class='text-center font-extrabold text-2xl')= pagina 
+
+        //- +button('/mis-propiedades', '← Volver')
+
+        section(class="shadow border p-5 mt-10 rounded space-y-4 ")
+            h3(class="text-left text-lg font-semibold text-indigo-800") Nombre: 
+                span(class="font-normal text-left text-lg text-gray-800")= `${usuario.nombre}`
+
+            p(class="text-left text-lg font-semibold text-indigo-800") E-mail: 
+                span(class="font-normal text-left text-lg text-gray-800")= usuario.email
+
+            p(class="text-left text-lg font-semibold text-indigo-800") Total de Propiedades: 
+                span(class="font-normal text-gray-800")= total
+            p(class="text-left text-lg font-semibold text-indigo-800") Total de Propiedades Publicadas: 
+                span(class="font-normal text-gray-800")= totalPubli
+            
+            +button('/mis-propiedades', 'Ver Mis Propiedades')
+

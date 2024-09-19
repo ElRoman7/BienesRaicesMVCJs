@@ -1,5 +1,7 @@
 import express, { Router } from "express";
-import { formularioLogin, formularioOlvidePassword, formularioRegistro, registrar, confirmar, resetPassword, comprobarToken, nuevoPassword, autenticar, cerrarSesion } from "../controllers/usuarioController.js";
+import { formularioLogin, formularioOlvidePassword, formularioRegistro, registrar, confirmar, resetPassword, comprobarToken, nuevoPassword, autenticar, cerrarSesion, miPerfil } from "../controllers/usuarioController.js";
+import protegerRuta from "../middleware/protegerRuta.js"
+import identificarUsuario from '../middleware/identificarUsuario.js'
 
 const router = express.Router();
 
@@ -21,6 +23,8 @@ router.post('/olvide-password' ,resetPassword);
 // Almacena el nuevo password
 router.get('/olvide-password/:token', comprobarToken);
 router.post('/olvide-password/:token', nuevoPassword);
+
+router.get('/mi-perfil', protegerRuta, identificarUsuario ,miPerfil);
 
 
 
