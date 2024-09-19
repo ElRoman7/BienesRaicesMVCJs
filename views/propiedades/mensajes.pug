@@ -1,9 +1,10 @@
 extends ../layout/admin
+include ../mixins/button
 
 block contenido
     h2(class="text-2xl font-extrabold text-center my-10")=pagina
 
-    a(href="/mis-propiedades" class="rounded-md py-2 px-10 bg-indigo-600 hover:bg-indigo-700 text-sm font-bold text-center text-white uppercase my-5 inline-block w-full sm:w-auto") Volver
+    +button('/mis-propiedades', '← Volver')
 
     div(class="mx-auto max-w-6xl bg-white shadow")
 
@@ -13,9 +14,10 @@ block contenido
                     li(class="border-gray-200 border-b p-5")
                         p(class="font-bold text-gray-800") Nombre: 
                             span(class="font-normal")= mensaje.usuario.nombre
-                        
-                        p(class="font-bold text-gray-800") Email: 
-                            span(class="font-normal")= mensaje.usuario.email
+                            
+                        a(href=`mailto:${mensaje.usuario.email}`) 
+                            p(class="font-bold text-gray-800") Email: 
+                                span(class="font-normal text-indigo-600")= mensaje.usuario.email
 
 
                         p(class="font-bold text-gray-800") Mensaje: 

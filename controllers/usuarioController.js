@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import Usuario from '../models/Usuario.js'
 import { generarId, generarJWT } from '../helpers/tokens.js';
 import { emailOlvidePassword, emailRegistro } from '../helpers/emails.js'
+import Propiedad from '../models/Propiedad.js';
 
 const formularioLogin =  (req, res) => {
     res.render('auth/login',{
@@ -297,6 +298,37 @@ const nuevoPassword = async (req, res) => {
     // console.log('Guardando el Password');
 }
 
+const miPerfil = async(req, res) => {
+
+    try {
+        const totalPubli = await Propiedad.count({
+            where: {
+                usuarioId: req.usuario.id,
+                publicado: 1
+            }
+        });
+
+        const total = await Propiedad.count({
+            where: {
+                usuarioId: req.usuario.id,
+            }
+        });
+
+        console.log('Total con publicación:', totalPubli);
+        console.log('Total sin publicación:', total);
+
+        res.render('auth/mi-perfil', {
+            pagina: 'Mi Perfil',
+            usuario: req.usuario,
+            total,
+            totalPubli
+        });
+    } catch (error) {
+        console.error('Error al obtener conteos:', error);
+        res.status(500).send('Error al obtener datos');
+    }
+}
+
 
 export {
     formularioLogin,
@@ -308,5 +340,6 @@ export {
     confirmar,
     resetPassword,
     comprobarToken,
-    nuevoPassword
+    nuevoPassword,
+    miPerfil
 }
