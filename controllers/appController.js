@@ -4,8 +4,8 @@ import { isAuthenticated } from '../helpers/index.js';
 
 const inicio = async (req, res) => {
 
-    const categorias = Categoria.findAll({raw : true})
-    const precios = Precio.findAll({raw : true});
+    const categorias = await Categoria.findAll({raw : true})
+    const precios = await Precio.findAll({raw : true});
 
     const [casas, departamentos ] = await Promise.all([
         Propiedad.findAll(
