@@ -31,7 +31,6 @@ try {
     console.log('Conexion Correcta a la base de datos');
 } catch (error) {
     console.log(error);
-
 } 
 
 // Habilitar Pug
