@@ -2,6 +2,7 @@ extends ../layout/admin
 
 block styles
     link(rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css")
+    //- meta(name="csrf-token" content=csrfToken)
 
 block contenido
     div(class="py-10") 
@@ -89,6 +90,12 @@ block contenido
                         input(type="hidden" name="calle" id="calle" value = datos.calle ? datos.calle : '')           
                         input(type="hidden" name="lat" id="lat" value= datos.lat ? datos.lat : '')           
                         input(type="hidden" name="lng" id="lng" value= datos.lng ? datos.lng : '') 
+
+                    //- div
+                    //-     label(class="block text-sm uppercase text-gray-600 mb-2 font-bold" for="imagen") Imagen de la Propiedad
+                    //-     if datos.imagen
+                    //-         img(src=`/uploads/${datos.imagen}` alt="Imagen Propiedad" class="h-40 w-40 object-cover mb-3")  
+                    //-     input(id="imagen" type="file" name="imagen" class="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400")
 
                     input(class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white font-bold uppercase cursor-pointer" type="submit" value="Guardar Cambios")            
 

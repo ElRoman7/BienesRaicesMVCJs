@@ -1,7 +1,9 @@
 import { validationResult } from 'express-validator'
 import { Precio, Categoria, Propiedad, Mensaje, Usuario } from '../models/index.js'
 import {unlink} from 'node:fs/promises'
-import { esVendedor, formatearFecha } from '../helpers/index.js'
+import { esVendedor, formatearFecha } from '../helpers/index.js';
+import fs from 'fs';
+import path from 'path';
 
 const admin = async (req, res) =>{
 
@@ -188,6 +190,31 @@ const agregarImagen = async (req, res) => {
     } );
 }
 
+const editarImagen = async (req, res) => {
+    const{id} = req.params //Obtenemos la variable id que pusimos en la url
+   
+    // Validar que la propiedad exista
+    const propiedad = await Propiedad.findByPk(id);
+    if(!propiedad){
+        return res.redirect('/mis-propiedades');
+    }
+    // validar que no esté publicada
+    // if(propiedad.publicado){
+    //     return res.redirect('/mis-propiedades');
+    // }
+    // Validar que la propiedad pertenece a quien visita la pagina
+    
+    if(propiedad.usuarioId.toString() != req.usuario.id.toString()){
+        return res.redirect('/mis-propiedades');
+    }
+
+    res.render('propiedades/editar-imagen',{
+        pagina: `Editar Imagen: ${propiedad.titulo}`,
+        propiedad,
+        csrfToken: req.csrfToken(),
+    } );
+}
+
 const almacenarImagen = async (req, res, next) => {
     const{id} = req.params //Obtenemos la variable id que pusimos en la url
    
@@ -197,9 +224,9 @@ const almacenarImagen = async (req, res, next) => {
         return res.redirect('/mis-propiedades');
     }
     // validar que no esté publicada
-    if(propiedad.publicado){
-        return res.redirect('/mis-propiedades');
-    }
+    // if(propiedad.publicado){
+    //     return res.redirect('/mis-propiedades');
+    // }
     // Validar que la propiedad pertenece a quien visita la pagina
     
     if(propiedad.usuarioId.toString() != req.usuario.id.toString()){
@@ -207,8 +234,23 @@ const almacenarImagen = async (req, res, next) => {
     }
 
     try {
+        // Verificar si ya hay una imagen existente
+        if (propiedad.imagen) {
+            // Ruta completa de la imagen existente
+            const oldImagePath = path.join(`./public/uploads/${propiedad.imagen}`);
+            
+            // Eliminar la imagen existente si existe
+            if (fs.existsSync(oldImagePath)) {
+                fs.unlinkSync(oldImagePath);
+            }
+            console.log('Imagen Eliminada');
+            
+        }
         // Almacenar la imagen y publicar propiedad
+        
         propiedad.imagen = req.file.filename;
+        console.log(propiedad.imagen);
+        
         propiedad.publicado = 1;
 
         await propiedad.save();
@@ -300,8 +342,6 @@ const guardarCambios = async (req, res) =>{
             lng,
             precio: precioId, //Renombrar variable
             categoria: categoriaId, //Renombrar variable
-            
-
             } = req.body
 
             propiedad.set({
@@ -317,9 +357,15 @@ const guardarCambios = async (req, res) =>{
                 categoriaId
             })
 
-            await propiedad.save();
+            // // Si se ha subido una imagen, actualiza la URL de la imagen
+            // if (req.file) {
+            //     propiedad.imagen = req.file.filename;
+            // }
 
-            res.redirect('/mis-propiedades');
+            await propiedad.save();
+            // next();
+
+            res.redirect(`/mis-propiedades`);
     
     } catch (error) {
         console.log(error);
@@ -504,6 +550,7 @@ export {
     crear,
     guardar,
     agregarImagen,
+    editarImagen,
     almacenarImagen,
     editar,
     guardarCambios,

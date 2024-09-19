@@ -1,6 +1,6 @@
 import express from "express"
 import { body } from 'express-validator'
-import { admin, crear, guardar, agregarImagen, almacenarImagen, editar, guardarCambios, eliminar, cambiarEstado ,mostrarPropiedad, enviarMensaje, verMensajes } from "../controllers/propiedadController.js"
+import { admin, crear, guardar, agregarImagen, editarImagen, almacenarImagen, editar, guardarCambios, eliminar, cambiarEstado ,mostrarPropiedad, enviarMensaje, verMensajes } from "../controllers/propiedadController.js"
 import protegerRuta from "../middleware/protegerRuta.js"
 import upload from '../middleware/subirImagen.js'
 import identificarUsuario from '../middleware/identificarUsuario.js'
@@ -36,8 +36,17 @@ router.post('/propiedades/agregar-imagen/:id',
     almacenarImagen
 );
 
-router.get('/propiedades/editar/:id', protegerRuta,
-    editar
+router.get('/propiedades/editar-imagen/:id', protegerRuta, editarImagen);
+
+router.post('/propiedades/editar-imagen/:id',
+    protegerRuta,
+    upload.single('imagen'),
+    almacenarImagen
+);
+
+router.get('/propiedades/editar/:id', 
+    protegerRuta,
+    editar,
 );
 
 router.post('/propiedades/editar/:id', protegerRuta,
@@ -50,6 +59,9 @@ router.post('/propiedades/editar/:id', protegerRuta,
     body('estacionamiento').isNumeric().withMessage('Selecciona la cantidad de estacionamientos'),
     body('wc').isNumeric().withMessage('Selecciona la cantidad de baños'),
     body('lat').notEmpty().withMessage('Ubica la propiedad en el mapa'),
+    // upload.single('imagen'),
+    // almacenarImagen,
+    
     guardarCambios //Funcion de editar en el controlador de propiedadController
 );
 
